@@ -19,4 +19,10 @@ class UserSkill extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // Define relationship with Skill table
+    public function skill()
+    {
+        return $this->belongsTo(Skill::class);
+    }
 }
