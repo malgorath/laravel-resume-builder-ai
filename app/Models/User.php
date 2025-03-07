@@ -53,4 +53,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(Resume::class);
     }
+
+    // Define relationship with UserDetail
+    public function userDetail()
+    {
+        return $this->hasOne(UserDetail::class);
+    }
+
+    // Define relationship with UserSkill
+    public function userSkills()
+    {
+        return $this->hasMany(UserSkill::class);
+    }
 }
