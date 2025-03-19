@@ -34,4 +34,24 @@ class UserSkillController extends Controller
         UserSkill::findOrFail($id)->delete();
         return redirect()->back()->with('success', 'Skill removed.');
     }
+
+    public function confirmNewSkills(Request $request)
+    {
+        $user = Auth::user();
+        $skills = $request->input('skills', []);
+
+        foreach ($skills as $skillName) {
+            // Check if skill exists, otherwise create
+            $skill = Skill::firstOrCreate(['name' => $skillName]);
+
+            // Assign skill to user
+            UserSkill::firstOrCreate([
+                'user_id' => $user->id,
+                'skill_id' => $skill->id
+            ]);
+        }
+
+        return response()->json(['message' => 'Skills updated successfully.']);
+    }
+
 }

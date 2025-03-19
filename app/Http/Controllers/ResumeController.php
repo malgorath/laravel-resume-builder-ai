@@ -8,7 +8,7 @@ use App\Models\Resume;
 use App\Services\OllamaService;
 use Smalot\PdfParser\Parser;
 use PhpOffice\PhpWord\IOFactory;
-
+use App\Models\Skill;
 class ResumeController extends Controller
 {
     protected $aiService;
@@ -25,36 +25,38 @@ class ResumeController extends Controller
 
     public function upload(Request $request)
     {
+
         $request->validate([
-            'resume' => 'required|mimes:pdf,doc,docx|max:2048',
+            'resume.*' => 'required|mimes:pdf,doc,docx|max:2048', // Validate file type and size
         ]);
 
-        $file = $request->file('resume');
-        $resumeText = $this->extractText($file);
+        if ($request->hasFile('resume')) {
+            foreach ($request->file('resume') as $file) {
+                // Save file data and metadata to the database
+                Resume::create([
+                    'user_id' => Auth::id(), // Associate the resume with the authenticated user
+                    'filename' => $file->getClientOriginalName(), // Original file name
+                    'mime_type' => $file->getClientMimeType(), // MIME type of the file
+                    'file_data' => file_get_contents($file->getRealPath()), // Binary file data
+                ]);
+            }
 
-        $resume = new Resume([
-            'user_id' => Auth::id(),
-            'filename' => $file->getClientOriginalName(),
-            'mime_type' => $file->getMimeType(),
-            'file_data' => file_get_contents($file),
-        ]);
-        $resume->save();
+            return back()->with('success', 'Files uploaded and stored in the database successfully!');
+        }
 
-       // Analyze the resume with Ollama
-        $analysis = $this->aiService->analyzeResume($resumeText, $resume);
-
-        return back()->with('success', 'Resume uploaded! AI Analysis: ' . substr($analysis, 0, 200) . '...');
+        return back()->withErrors(['resume' => 'Please upload at least one file.']);
     }
 
     private function extractText($file)
     {
+        $text = '';
+
         if ($file->getClientOriginalExtension() === 'pdf') {
             $parser = new Parser();
             $pdf = $parser->parseContent(file_get_contents($file));
-            return $pdf->getText();
+            $text = $pdf->getText();
         } elseif (in_array($file->getClientOriginalExtension(), ['doc', 'docx'])) {
             $phpWord = IOFactory::load($file->getPathname());
-            $text = '';
             foreach ($phpWord->getSections() as $section) {
                 foreach ($section->getElements() as $element) {
                     if (method_exists($element, 'getText')) {
@@ -62,9 +64,14 @@ class ResumeController extends Controller
                     }
                 }
             }
-            return $text;
+        } else {
+            $text = 'Unsupported file type.';
         }
-        return 'Unsupported file type.';
+
+        // Process the extracted text using OllamaService
+        $processedText = $this->aiService->processText($text);
+
+        return $processedText;
     }
 
     public function download($id)

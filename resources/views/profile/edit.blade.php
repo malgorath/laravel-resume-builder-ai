@@ -3,6 +3,46 @@
 @section('content')
 <div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md">
     <h2 class="text-xl font-bold mb-4">Edit Profile</h2>
+    @if(session('new_skills'))
+        <div id="skillPopup" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+            <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm">
+                <h3 class="text-lg font-semibold mb-4">Confirm New Skills</h3>
+                <p>The following skills were detected in your resume:</p>
+                <ul class="mt-2">
+                    @foreach(session('new_skills') as $skill)
+                        <li>
+                            <label>
+                                <input type="checkbox" name="confirmed_skills[]" value="{{ $skill }}" checked>
+                                {{ $skill }}
+                            </label>
+                        </li>
+                    @endforeach
+                </ul>
+                <button onclick="submitNewSkills()" class="bg-green-500 text-white px-4 py-2 mt-4 rounded">Confirm</button>
+            </div>
+        </div>
+
+        <script>
+            function submitNewSkills() {
+                let selectedSkills = [];
+                document.querySelectorAll('input[name="confirmed_skills[]"]:checked').forEach(skill => {
+                    selectedSkills.push(skill.value);
+                });
+
+                fetch("{{ route('profile.skills.confirm') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({ skills: selectedSkills })
+                }).then(response => {
+                    location.reload();
+                });
+            }
+        </script>
+    @endif
+
 
     <form method="POST" action="{{ route('profile.update', $user->id) }}">
         @csrf

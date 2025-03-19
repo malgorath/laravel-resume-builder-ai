@@ -27,6 +27,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::post('/profile/skills/confirm', [UserSkillController::class, 'confirmNewSkills'])->name('profile.skills.confirm');
+
     Route::get('/profile/edit', [UserDetailController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/update/{id}', [UserDetailController::class, 'update'])->name('profile.update');
 

@@ -6,19 +6,20 @@ use App\Models\Resume;
 
 class OllamaService
 {
-    protected $baseUrl;
+    protected static $baseUrl;
+    protected static $llm_model;
 
     public function __construct()
     {
-        $this->baseUrl = env('OLLAMA_API_URL', 'http://localhost:11434/api/generate');
+        self::$baseUrl = env('OLLAMA_API_URL', 'http://localhost:11434/api/generate');
+        self::$llm_model = env('OLLAMA_LLM_MODEL', 'gemma');
     }
 
+    // Analyze resume with Ollama AI
     public function analyzeResume($resumeText, $resume)
     {
-        // $resumeText = substr($resumeText, 0, 1000); // Limit text to 1000 chars
-
-        $response = Http::post('http://localhost:11434/api/generate', [
-            'model' => 'mistral', // Change to gemma or llama3 if needed
+        $response = Http::timeout(120)->post(self::$baseUrl, [
+            'model' => self::$llm_model,
             'prompt' => "Analyze this resume:\n\n" . $resumeText,
             'stream' => false,
         ]);
@@ -31,6 +32,25 @@ class OllamaService
 
 
         return $analysis; // Return the AI analysis for frontend display
+    }
+
+    // Extract skills from resume text
+    public static function extractSkills($text)
+    {
+        // Prepare the API request payload
+        $response = Http::timeout(120)->post(self::$baseUrl, [
+            'model' => self::$llm_model,
+            'prompt' => "Extract technical and professional skill words from the following resume text: \n\n" . $text,
+            'stream' => false
+        ]);
+
+        // Decode response
+        if ($response->successful()) {
+            $data = $response->json();
+            return isset($data['response']) ? explode(",", $data['response']) : [];
+        }
+
+        return [];
     }
 
     public function matchJob($resumeText, $jobDescription)
