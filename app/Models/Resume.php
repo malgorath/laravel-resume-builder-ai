@@ -17,10 +17,6 @@ class Resume extends Model
         'file_data',
     ];
 
-    protected $casts = [
-        'file_data' => 'string', // Ensure file data is stored as string
-    ];
-
     /**
      * Get the user that owns the resume.
      */

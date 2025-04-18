@@ -3,11 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Resume;
-use App\Models\Skill;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB; // Import DB facade
+use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
@@ -15,37 +13,37 @@ class UserSeeder extends Seeder
      * Run the database seeds.
      */
     public function run(): void {
-        $numberOfUsers = 10; // How many users to create
-        $maxResumesPerUser = 4; // Max resumes per user (will be random between 1 and this)
-        $maxSkillsPerResume = 15; // Max skills per resume (will be random between 5 and this)
+        // Define the specific user details
+        $email = 'test@home.net';
+        $firstName = 'Test';
+        $lastName = 'User';
+        $defaultPassword = 'password';
 
-        // Get all available skill IDs once for efficiency
-        $skillIds = Skill::pluck('id')->toArray();
+        // Use firstOrCreate to prevent creating duplicates if the seeder runs again
+        $user = User::firstOrCreate(
+            [
+                'email' => $email // Attribute to find the user by
+            ],
+            [
+                'name' => $firstName . " " . $lastName,
+                'password' => Hash::make($defaultPassword), // Hash the password
+            ]
+        );
 
-        if (empty($skillIds)) {
-            $this->command->error('No skills found. Please run SkillSeeder first.');
-            return;
+        // Update the info message based on whether the user was created or found
+        if ($user->wasRecentlyCreated) {
+            $this->command->info("Created default user: {$firstName} {$lastName} ({$email}) with default password '{$defaultPassword}'.");
+        } else {
+            $this->command->info("Default user already exists: {$firstName} {$lastName} ({$email}). Password not changed.");
         }
+        $numberOfUsers = 10; // How many users to create
 
-        User::factory($numberOfUsers)->create()->each(function ($user) use ($skillIds, $maxResumesPerUser, $maxSkillsPerResume) {
-            $numberOfResumes = rand(1, $maxResumesPerUser);
-
-            Resume::factory($numberOfResumes)
-                ->for($user) // Associate resume with the current user
-                ->create()
-                ->each(function ($resume) use ($skillIds, $maxSkillsPerResume) {
-                    // Select a random number of skills for this resume
-                    $numberOfSkills = rand(5, $maxSkillsPerResume);
-
-                    // Shuffle skill IDs and take a random subset
-                    shuffle($skillIds);
-                    $skillsToAttach = array_slice($skillIds, 0, $numberOfSkills);
-
-                    // Attach the selected skills to the resume
-                    $resume->skills()->attach($skillsToAttach);
-                });
+        // Create users only
+        User::factory($numberOfUsers)->create()->each(function ($user) {
+            // You could add other user-specific seeding logic here if needed
         });
 
-         $this->command->info("Seeded {$numberOfUsers} users, each with random resumes and skills.");
+        // Update the info message
+        $this->command->info("Seeded {$numberOfUsers} users.");
     }
 }

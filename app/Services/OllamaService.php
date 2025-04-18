@@ -3,6 +3,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use App\Models\Resume;
+use Illuminate\Support\Facades\Log; 
 
 class OllamaService
 {
@@ -12,7 +13,7 @@ class OllamaService
     public function __construct()
     {
         self::$baseUrl = env('OLLAMA_API_URL', 'http://localhost:11434/api/generate');
-        self::$llm_model = env('OLLAMA_LLM_MODEL', 'gemma');
+        self::$llm_model = env('OLLAMA_LLM_MODEL', 'gemma3:4b');
     }
 
     // Analyze resume with Ollama AI
@@ -23,7 +24,7 @@ class OllamaService
             'prompt' => "Analyze this resume:\n\n" . $resumeText,
             'stream' => false,
         ]);
-
+        Log::info($response);
         $analysis = $response->json()['response'] ?? 'Error analyzing resume.';
 
         // Store the AI analysis with the resume

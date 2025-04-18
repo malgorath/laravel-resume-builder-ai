@@ -7,8 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Services\OllamaService;
 use Smalot\PdfParser\Parser;
 use PhpOffice\PhpWord\IOFactory;
-use Illuminate\Support\Facades\Log; // <-- Add Log facade
-use Exception; // <-- Add base Exception class
+use Illuminate\Support\Facades\Log; 
+use Illuminate\Support\Str;
+use Exception; 
 
 class ResumesController extends Controller
 {
@@ -41,9 +42,21 @@ class ResumesController extends Controller
                 if ($resume->mime_type === 'application/pdf') {
                     $parser = new Parser();
                     // Attempt to parse PDF content from binary data
-                    $pdf = $parser->parseContent($resume->file_data);
-                    $resumeText = $pdf->getText();
+                    $pdfContent = null;
 
+                    if (is_resource($resume->file_data)) {
+                        rewind($resume->file_data);
+                        $pdfContent = stream_get_contents($resume->file_data);
+                    } elseif (is_string($resume->file_data)) {
+                        $pdfContent = $resume->file_data;
+                    }
+                
+                    if ($pdfContent !== null) {
+                        $pdf = $parser->parseContent($pdfContent);
+                        $resumeText = $pdf->getText();
+                    } else {
+                        Log::error("Could not read PDF content for resume ID {$resume->id}. file_data type: " . gettype($resume->file_data));
+                    }
                 } elseif (in_array($resume->mime_type, [
                     'application/msword', // .doc
                     'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
