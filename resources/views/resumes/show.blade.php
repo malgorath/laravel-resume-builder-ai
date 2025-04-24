@@ -29,7 +29,7 @@
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    {!! nl2br($resume->ai_analysis) !!}
+                    @markdown($resume->ai_analysis)
                 </div>
             </div>
     </div>

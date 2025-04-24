@@ -51,6 +51,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/resumes/upload', [ResumeController::class, 'showUploadForm'])->name('resumes.upload.form');
     Route::post('/resumes/upload', [ResumeController::class, 'upload'])->name('resumes.upload');
     Route::get('/resumes/{id}/download', [ResumeController::class, 'download'])->name('resumes.download');
+    Route::get('/resumes/{id}/reset-analysis', [ResumesController::class, 'resetAnalysis'])->name('resumes.resetAnalysis');
+
     
     // List all resumes for the authenticated user
     Route::get('/resumes', [ResumesController::class, 'index'])->name('resumes.index');

@@ -3,6 +3,8 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use App\Models\Resume;
+use App\Models\Skill;
+use App\Models\UserSkill;
 use Illuminate\Support\Facades\Log; 
 
 class OllamaService
@@ -24,13 +26,33 @@ class OllamaService
             'prompt' => "Analyze this resume:\n\n" . $resumeText,
             'stream' => false,
         ]);
-        Log::info($response);
+        
         $analysis = $response->json()['response'] ?? 'Error analyzing resume.';
+        $skills = self::extractSkills($resumeText); // Extract skills from the resume text
+        Log::info($skills); // Log the skills 
+
+        // Lets Check if the skills are in the Skills table
+        $allSkills = Skill::all(); // Get all skills from the database
+        foreach ($skills as $skill) {
+            // See if $skill is in the allSkills array and add missing skills to the Skill table
+            if (!in_array($skill, $allSkills)) {
+                $newSkill = new Skill();
+                $newSkill->name = $skill;
+                $newSkill->save();
+
+                // Add the new skill to the UserSkill table if it doesn't already exist
+                if (!UserSkill::where('skill_id', $newSkill->id)->exists()) {
+                    $newUserSkill = new UserSkill();
+                    $newUserSkill->user_id = $resume->user_id;
+                    $newUserSkill->skill_id = $newSkill->id;
+                    $newUserSkill->save();
+                }
+            }
+        }         
 
         // Store the AI analysis with the resume
         $resume->ai_analysis = $analysis; // Store the analysis in the database
         $resume->save(); // Save the resume with the analysis
-
 
         return $analysis; // Return the AI analysis for frontend display
     }
@@ -41,7 +63,7 @@ class OllamaService
         // Prepare the API request payload
         $response = Http::timeout(120)->post(self::$baseUrl, [
             'model' => self::$llm_model,
-            'prompt' => "Extract technical and professional skill words from the following resume text: \n\n" . $text,
+            'prompt' => "Extract technical and professional skill words from the following resume text and return as comma seperated array only, trimming off extra white spaces as needed, only the data no extra characters or text: \n\n" . $text,
             'stream' => false
         ]);
 

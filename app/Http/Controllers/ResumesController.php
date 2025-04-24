@@ -27,6 +27,14 @@ class ResumesController extends Controller
         return view('resumes.index', compact('resumes'));
     }
 
+    public function resetAnalysis($id)
+    {
+        $resume = Resume::findOrFail($id);
+        $resume->ai_analysis = null;
+        $resume->save();
+        return redirect()->back();
+    }
+
     // Show a specific resume, perform analysis if not available
     public function show($id)
     {
