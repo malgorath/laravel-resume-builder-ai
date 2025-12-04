@@ -36,6 +36,23 @@ class UserSeeder extends Seeder
         } else {
             $this->command->info("Default user already exists: {$firstName} {$lastName} ({$email}). Password not changed.");
         }
+
+        // Create admin user
+        $adminUser = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Admin User',
+                'password' => Hash::make('admin123'),
+                'role' => 'admin',
+            ]
+        );
+
+        if ($adminUser->wasRecentlyCreated) {
+            $this->command->info("Created admin user: admin@example.com with password 'admin123'.");
+        } else {
+            $this->command->info("Admin user already exists: admin@example.com");
+        }
+
         $numberOfUsers = 10; // How many users to create
 
         // Create users only

@@ -1,92 +1,112 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md">
-    <h2 class="text-xl font-bold mb-4">Edit Profile</h2>
-    @if(session('new_skills'))
-        <div id="skillPopup" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-            <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm">
-                <h3 class="text-lg font-semibold mb-4">Confirm New Skills</h3>
-                <p>The following skills were detected in your resume:</p>
-                <ul class="mt-2">
-                    @foreach(session('new_skills') as $skill)
-                        <li>
-                            <label>
-                                <input type="checkbox" name="confirmed_skills[]" value="{{ $skill }}" checked>
-                                {{ $skill }}
-                            </label>
-                        </li>
-                    @endforeach
-                </ul>
-                <button onclick="submitNewSkills()" class="bg-green-500 text-white px-4 py-2 mt-4 rounded">Confirm</button>
+<div class="card">
+    <div class="card-header">
+        <h2>Edit Profile</h2>
+    </div>
+    <div class="card-body">
+        @if(session('new_skills'))
+            <div id="skillPopup" class="modal fade show" style="display: block;" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Confirm New Skills</h5>
+                            <button type="button" class="btn-close" onclick="closeSkillPopup()"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>The following skills were detected in your resume:</p>
+                            <ul class="list-group">
+                                @foreach(session('new_skills') as $skill)
+                                    <li class="list-group-item">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="confirmed_skills[]" value="{{ $skill }}" id="skill_{{ $loop->index }}" checked>
+                                            <label class="form-check-label" for="skill_{{ $loop->index }}">{{ $skill }}</label>
+                                        </div>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" onclick="submitNewSkills()">Confirm</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+            <div class="modal-backdrop fade show"></div>
 
-        <script>
-            function submitNewSkills() {
-                let selectedSkills = [];
-                document.querySelectorAll('input[name="confirmed_skills[]"]:checked').forEach(skill => {
-                    selectedSkills.push(skill.value);
-                });
+            <script>
+                function closeSkillPopup() {
+                    document.getElementById('skillPopup').style.display = 'none';
+                    document.querySelector('.modal-backdrop').remove();
+                }
 
-                fetch("{{ route('profile.skills.confirm') }}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                    },
-                    body: JSON.stringify({ skills: selectedSkills })
-                }).then(response => {
-                    location.reload();
-                });
-            }
-        </script>
-    @endif
+                function submitNewSkills() {
+                    let selectedSkills = [];
+                    document.querySelectorAll('input[name="confirmed_skills[]"]:checked').forEach(skill => {
+                        selectedSkills.push(skill.value);
+                    });
 
+                    fetch("{{ route('profile.skills.confirm') }}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify({ skills: selectedSkills })
+                    }).then(response => {
+                        location.reload();
+                    });
+                }
+            </script>
+        @endif
 
-    <form method="POST" action="{{ route('profile.update', $user->id) }}">
-        @csrf
-        @method('POST')
+        <form method="POST" action="{{ route('profile.details.update', $user->id) }}">
+            @csrf
+            @method('POST')
 
-        <div class="mb-4">
-            <label class="block text-sm font-medium">Address</label>
-            <input type="text" name="address" value="{{ old('address', $user->userDetail->address ?? '') }}" class="w-full border rounded px-3 py-2">
-        </div>
+            <div class="mb-3">
+                <label for="address" class="form-label">Address</label>
+                <input type="text" class="form-control" id="address" name="address" value="{{ old('address', $user->userDetail->address ?? '') }}">
+            </div>
 
-        <div class="mb-4">
-            <label class="block text-sm font-medium">Phone</label>
-            <input type="text" name="phone" value="{{ old('phone', $user->userDetail->phone ?? '') }}" class="w-full border rounded px-3 py-2">
-        </div>
+            <div class="mb-3">
+                <label for="phone" class="form-label">Phone</label>
+                <input type="text" class="form-control" id="phone" name="phone" value="{{ old('phone', $user->userDetail->phone ?? '') }}">
+            </div>
 
-        <div class="mb-4">
-            <label class="block text-sm font-medium">LinkedIn</label>
-            <input type="text" name="linkedin" value="{{ old('linkedin', $user->userDetail->linkedin ?? '') }}" class="w-full border rounded px-3 py-2">
-        </div>
+            <div class="mb-3">
+                <label for="linkedin" class="form-label">LinkedIn</label>
+                <input type="text" class="form-control" id="linkedin" name="linkedin" value="{{ old('linkedin', $user->userDetail->linkedin ?? '') }}">
+            </div>
 
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save Details</button>
-    </form>
+            <button type="submit" class="btn btn-primary">Save Details</button>
+        </form>
 
-    <h3 class="text-lg font-semibold mt-6">Skills</h3>
+        <hr class="my-4">
 
-    <form method="POST" action="{{ route('profile.skills.add', $user->id) }}" class="mt-2">
-        @csrf
-        <div class="flex gap-2">
-            <input type="text" name="skill" class="border rounded px-3 py-2 w-full" placeholder="New skill">
-            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Add</button>
-        </div>
-    </form>
+        <h3 class="mb-3">Skills</h3>
 
-    <ul class="mt-4">
-        @foreach($user->userSkills as $skill)
-            <li class="flex justify-between items-center bg-gray-100 p-2 rounded mt-2">
-                {{ $skill->skill }}
-                <form method="POST" action="{{ route('profile.skills.delete', $skill->id) }}">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Remove</button>
-                </form>
-            </li>
-        @endforeach
-    </ul>
+        <form method="POST" action="{{ route('profile.skills.add', $user->id) }}" class="mb-3">
+            @csrf
+            <div class="input-group">
+                <input type="text" name="skill" class="form-control" placeholder="New skill" required>
+                <button type="submit" class="btn btn-success">Add</button>
+            </div>
+        </form>
+
+        <ul class="list-group">
+            @foreach($user->userSkills as $userSkill)
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ $userSkill->skill->name ?? ($userSkill->skill ?? 'Unknown Skill') }}
+                    <form method="POST" action="{{ route('profile.skills.delete', $userSkill->id) }}" class="d-inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                    </form>
+                </li>
+            @endforeach
+        </ul>
+    </div>
 </div>
 @endsection

@@ -76,6 +76,18 @@ seed:
 test:
 	docker compose exec app php artisan test
 
+# Run tests with verbose output
+test-verbose:
+	docker compose exec app php artisan test --verbose
+
+# Run specific test file
+test-file:
+	@if [ -z "$(file)" ]; then \
+		echo "Usage: make test-file file=ResumeTest"; \
+	else \
+		docker compose exec app php artisan test --filter $(file); \
+	fi
+
 # Initial setup
 setup:
 	@echo "Setting up Laravel Resume Builder AI..."

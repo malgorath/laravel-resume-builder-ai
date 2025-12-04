@@ -38,6 +38,6 @@ class UserDetailController extends Controller
             $data
         );
 
-        return response()->json($userDetail);
+        return redirect()->route('profile.edit')->with('success', 'Profile details updated successfully.');
     }
 }

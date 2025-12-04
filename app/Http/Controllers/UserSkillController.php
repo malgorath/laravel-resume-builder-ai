@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\UserSkill;
+use App\Models\Skill;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserSkillController extends Controller
 {
@@ -20,9 +22,13 @@ class UserSkillController extends Controller
             'skill' => 'required|string|max:255',
         ]);
 
-        $skill = UserSkill::create([
+        // Find or create the skill
+        $skill = Skill::firstOrCreate(['name' => $data['skill']]);
+
+        // Create user skill relationship
+        UserSkill::firstOrCreate([
             'user_id' => $userId,
-            'skill' => $data['skill'],
+            'skill_id' => $skill->id,
         ]);
 
         return redirect()->back()->with('success', 'Skill added.');

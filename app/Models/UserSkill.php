@@ -11,7 +11,7 @@ class UserSkill extends Model
 
     protected $fillable = [
         'user_id',
-        'skill',
+        'skill_id',
     ];
 
     // Define relationship with User

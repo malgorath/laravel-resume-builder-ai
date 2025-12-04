@@ -1,8 +1,8 @@
 {{-- resources/views/layouts/partials/navbar-bootstrap.blade.php --}}
-<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom shadow-sm">
     <div class="container">
         {{-- Branding --}}
-        <a class="navbar-brand" href="{{ route('dashboard') }}">
+        <a class="navbar-brand fw-bold" href="{{ route('home') }}">
             {{ config('app.name', 'Laravel') }}
         </a>
 
@@ -14,41 +14,53 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <!-- Left Side Of Navbar -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
-                        {{ __('Dashboard') }}
-                    </a>
-                </li>
-                {{-- Add other main navigation links here if needed --}}
-                {{-- Example:
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('resumes.index') ? 'active' : '' }}" href="{{ route('resumes.index') }}">
-                        {{ __('My Resumes') }}
-                    </a>
-                </li>
-                 --}}
+                @auth
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('resumes.*') ? 'active' : '' }}" href="{{ route('resumes.index') }}">
+                            <i class="bi bi-file-earmark-person"></i> My Resumes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('jobs.*') ? 'active' : '' }}" href="{{ route('jobs.index') }}">
+                            <i class="bi bi-briefcase"></i> Job Listings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('applications.*') ? 'active' : '' }}" href="{{ route('applications.index') }}">
+                            <i class="bi bi-clipboard-check"></i> Applications
+                        </a>
+                    </li>
+                @endauth
             </ul>
 
             <!-- Right Side Of Navbar -->
             <ul class="navbar-nav ms-auto">
                 {{-- Authentication Links --}}
                 @auth
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" href="{{ route('profile.edit') }}">
+                            <i class="bi bi-person-circle"></i> Profile
+                        </a>
+                    </li>
                     <li class="nav-item dropdown">
-                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                            {{ Auth::user()->name }}
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="bi bi-person-fill"></i> {{ Auth::user()->name }}
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            {{-- Profile Link (Assumes Breeze default route name) --}}
                             <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                                {{ __('Profile') }}
+                                <i class="bi bi-gear"></i> Settings
                             </a>
-
-                            {{-- Logout Form --}}
-                            <a class="dropdown-item" href="{{ route('logout') }}"
+                            <hr class="dropdown-divider">
+                            <a class="dropdown-item text-danger" href="{{ route('logout') }}"
                                onclick="event.preventDefault();
                                              document.getElementById('logout-form').submit();">
-                                {{ __('Log Out') }}
+                                <i class="bi bi-box-arrow-right"></i> Log Out
                             </a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                 @csrf
@@ -57,19 +69,18 @@
                     </li>
                 @endauth
 
-                {{-- Add links for guests if this navbar were ever used on guest pages --}}
-                {{-- @guest
+                @guest
                     @if (Route::has('login'))
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                            <a class="nav-link" href="{{ route('login') }}">Login</a>
                         </li>
                     @endif
                     @if (Route::has('register'))
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+                            <a class="nav-link btn btn-primary text-white ms-2" href="{{ route('register') }}" style="padding: 0.375rem 1rem;">Sign Up</a>
                         </li>
                     @endif
-                @endguest --}}
+                @endguest
             </ul>
         </div>
     </div>

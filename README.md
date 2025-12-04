@@ -134,12 +134,12 @@ public function matchJob($resumeText, $jobDescription)
 The application uses Ollama as the LLM backend. Configure in your `.env`:
 
 ```env
-# Ollama Configuration
+# Ollama Configuration (local install)
 OLLAMA_API_URL=http://localhost:11434/api/generate
 OLLAMA_LLM_MODEL=gemma3:4b
 
-# For Docker environments
-OLLAMA_API_URL=http://host.docker.internal:11434/api/generate
+# For Docker environments, use host.docker.internal to reach the host machine:
+# OLLAMA_API_URL=http://host.docker.internal:11434/api/generate
 ```
 
 #### Supported Models
@@ -273,8 +273,8 @@ ollama serve
 
 Update your `.env` file if needed:
 ```env
-OLLAMA_HOST=http://host.docker.internal:11434
-OLLAMA_MODEL=llama3.2
+OLLAMA_API_URL=http://host.docker.internal:11434/api/generate
+OLLAMA_LLM_MODEL=llama3.2
 ```
 
 #### Development with Hot Reloading
@@ -376,6 +376,71 @@ docker compose logs -f nginx
    ```bash
    composer dev
    ```
+
+---
+
+## Database Seeding
+
+To populate the database with sample data for testing:
+
+```bash
+# Using Docker
+docker compose exec app php artisan db:seed
+
+# Or locally
+php artisan db:seed
+```
+
+To reset and seed the database:
+
+```bash
+# Using Docker
+docker compose exec app php artisan migrate:fresh --seed
+
+# Or locally
+php artisan migrate:fresh --seed
+```
+
+Available seeders:
+- `UserSeeder` - Creates test users
+- `SkillSeeder` - Populates skills table
+- `UserDetailSeeder` - Creates user profile details
+
+---
+
+## Testing
+
+The project includes comprehensive test coverage. Run tests with:
+
+```bash
+# Using Docker
+docker compose exec app php artisan test
+
+# Or using Make
+make test
+
+# Or locally
+php artisan test
+```
+
+### Test Coverage
+
+- **Authentication Tests**: Registration, login, logout, password reset
+- **Resume Tests**: Upload (PDF/DOCX), download, view, AI analysis
+- **Profile & Skills Tests**: Update details, add/remove skills
+- **AI Service Tests**: Resume analysis, skill extraction, job matching (mocked)
+- **Job & Application Tests**: CRUD operations, application tracking
+- **Model Relationship Tests**: All Eloquent relationships
+
+### Running Specific Tests
+
+```bash
+# Run a specific test file
+php artisan test --filter ResumeTest
+
+# Run with coverage (requires Xdebug)
+php artisan test --coverage
+```
 
 ---
 

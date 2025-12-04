@@ -71,4 +71,10 @@ class User extends Authenticatable
     {
         return $this->hasManyThrough(Skill::class, UserSkill::class, 'user_id', 'id', 'id', 'skill_id');
     }
+
+    // Define relationship with Applications
+    public function applications()
+    {
+        return $this->hasMany(Application::class);
+    }
 }
