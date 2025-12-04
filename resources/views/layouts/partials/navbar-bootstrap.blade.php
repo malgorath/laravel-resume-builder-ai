@@ -14,6 +14,12 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <!-- Left Side Of Navbar -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                {{-- Job Listings - visible to everyone --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('jobs.*') ? 'active' : '' }}" href="{{ route('jobs.index') }}">
+                        <i class="bi bi-briefcase"></i> Job Listings
+                    </a>
+                </li>
                 @auth
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
@@ -23,11 +29,6 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('resumes.*') ? 'active' : '' }}" href="{{ route('resumes.index') }}">
                             <i class="bi bi-file-earmark-person"></i> My Resumes
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('jobs.*') ? 'active' : '' }}" href="{{ route('jobs.index') }}">
-                            <i class="bi bi-briefcase"></i> Job Listings
                         </a>
                     </li>
                     <li class="nav-item">

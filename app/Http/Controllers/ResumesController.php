@@ -77,7 +77,7 @@ class ResumesController extends Controller
                 $message .= "{$errorCount} file(s) failed to upload. Check logs for details.";
                 return back()->withErrors(['resume' => $message])->withInput();
             }
-            return back()->with('success', $message);
+            return redirect()->route('resumes.index')->with('success', $message);
         }
 
         return back()->withErrors(['resume' => 'Please upload at least one file.']);

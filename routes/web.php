@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Job Routes (public - anyone can view jobs)
+Route::get('/jobs', [JobController::class, 'index'])->name('jobs.index');
+// Use route constraint to prevent 'create' and 'edit' from matching as job IDs
+Route::get('/jobs/{job}', [JobController::class, 'show'])->name('jobs.show')->where('job', '[0-9]+');
+
 Route::middleware('auth')->group(function () {
     // Profile Routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -45,8 +50,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/resumes/{id}/match-job', [ResumesController::class, 'matchJob'])->name('resumes.matchJob');
     Route::post('/resumes/{id}/generate-cover-letter', [ResumesController::class, 'generateCoverLetter'])->name('resumes.generateCoverLetter');
 
-    // Job Routes
-    Route::resource('jobs', JobController::class);
+    // Job Routes (admin-only for create/edit/delete)
+    // These must be before the public show route to avoid conflicts
+    Route::get('/jobs/create', [JobController::class, 'create'])->name('jobs.create');
+    Route::post('/jobs', [JobController::class, 'store'])->name('jobs.store');
+    Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])->name('jobs.edit');
+    Route::put('/jobs/{job}', [JobController::class, 'update'])->name('jobs.update');
+    Route::delete('/jobs/{job}', [JobController::class, 'destroy'])->name('jobs.destroy');
 
     // Application Routes
     Route::resource('applications', ApplicationController::class)->except(['edit', 'update']);
@@ -56,8 +66,23 @@ Route::middleware('auth')->group(function () {
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
         Route::get('/users', [AdminController::class, 'users'])->name('users.index');
+        Route::get('/users/{user}/edit', [AdminController::class, 'editUser'])->name('users.edit');
+        Route::put('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
+        Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
         Route::get('/jobs', [AdminController::class, 'jobs'])->name('jobs.index');
         Route::get('/applications', [AdminController::class, 'applications'])->name('applications.index');
+        
+        // Company CRUD
+        Route::resource('companies', \App\Http\Controllers\CompanyController::class);
+        
+        // Skill CRUD
+        Route::resource('skills', \App\Http\Controllers\SkillController::class);
+        
+        // AI Suggestions (users can view their own, admins can manage all)
+        Route::get('/ai-suggestions', [\App\Http\Controllers\AiSuggestionController::class, 'index'])->name('ai-suggestions.index');
+        Route::get('/ai-suggestions/{aiSuggestion}', [\App\Http\Controllers\AiSuggestionController::class, 'show'])->name('ai-suggestions.show');
+        Route::put('/ai-suggestions/{aiSuggestion}', [\App\Http\Controllers\AiSuggestionController::class, 'update'])->name('ai-suggestions.update');
+        Route::delete('/ai-suggestions/{aiSuggestion}', [\App\Http\Controllers\AiSuggestionController::class, 'destroy'])->name('ai-suggestions.destroy');
     });
 });
 

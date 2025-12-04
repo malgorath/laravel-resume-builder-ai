@@ -1,6 +1,6 @@
 # Docker Makefile for Laravel Resume Builder AI
 
-.PHONY: help build up down restart logs shell artisan composer npm fresh migrate seed test
+.PHONY: help build up down restart logs shell artisan composer npm fresh migrate seed seeds test cache-clear
 
 # Default target
 help:
@@ -21,7 +21,9 @@ help:
 	@echo "  fresh       Fresh install (build, migrate, seed)"
 	@echo "  migrate     Run database migrations"
 	@echo "  seed        Run database seeders"
+	@echo "  seeds       Alias for seed command"
 	@echo "  test        Run tests"
+	@echo "  cache-clear Clear all Laravel caches"
 	@echo "  setup       Initial setup for new install"
 
 # Build containers
@@ -72,6 +74,9 @@ migrate:
 seed:
 	docker compose exec app php artisan db:seed
 
+# Alias for seed
+seeds: seed
+
 # Run tests
 test:
 	docker compose exec app php artisan test
@@ -87,6 +92,10 @@ test-file:
 	else \
 		docker compose exec app php artisan test --filter $(file); \
 	fi
+
+# Clear all caches
+cache-clear:
+	docker compose exec app php artisan optimize:clear
 
 # Initial setup
 setup:

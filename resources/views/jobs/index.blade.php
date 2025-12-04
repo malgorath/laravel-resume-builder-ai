@@ -34,6 +34,8 @@
                         <a href="{{ route('jobs.show', $job->id) }}" class="btn btn-sm btn-primary">View Details</a>
                         @auth
                             <a href="{{ route('applications.create', ['job_id' => $job->id]) }}" class="btn btn-sm btn-success">Apply</a>
+                        @else
+                            <a href="{{ route('login') }}" class="btn btn-sm btn-outline-primary">Login to Apply</a>
                         @endauth
                     </div>
                 </div>

@@ -41,6 +41,54 @@
             .table {
                 background: white;
             }
+            /* Ensure navbar collapse works properly */
+            @media (min-width: 992px) {
+                .navbar-collapse {
+                    display: flex !important;
+                }
+            }
+            /* Make sure nav links are visible */
+            .navbar-nav .nav-link {
+                color: rgba(255, 255, 255, 0.85) !important;
+            }
+            .navbar-nav .nav-link:hover {
+                color: rgba(255, 255, 255, 1) !important;
+            }
+            /* Fix pagination styling for Bootstrap */
+            .pagination {
+                margin-bottom: 0;
+            }
+            .pagination .page-link {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.875rem;
+                line-height: 1.5;
+                color: #0d6efd;
+                background-color: #fff;
+                border: 1px solid #dee2e6;
+            }
+            .pagination .page-link:hover {
+                z-index: 2;
+                color: #0a58ca;
+                background-color: #e9ecef;
+                border-color: #dee2e6;
+            }
+            .pagination .page-item.active .page-link {
+                z-index: 3;
+                color: #fff;
+                background-color: #0d6efd;
+                border-color: #0d6efd;
+            }
+            .pagination .page-item.disabled .page-link {
+                color: #6c757d;
+                pointer-events: none;
+                background-color: #fff;
+                border-color: #dee2e6;
+            }
+            /* Ensure pagination arrows are properly sized */
+            .pagination .page-link {
+                min-width: 38px;
+                text-align: center;
+            }
         </style>
 
     </head>
