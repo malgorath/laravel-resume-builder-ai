@@ -6,6 +6,7 @@ use App\Http\Controllers\UserDetailController;
 use App\Http\Controllers\UserSkillController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -50,6 +51,14 @@ Route::middleware('auth')->group(function () {
     // Application Routes
     Route::resource('applications', ApplicationController::class)->except(['edit', 'update']);
     Route::post('/applications/{application}', [ApplicationController::class, 'update'])->name('applications.update');
+
+    // Admin Routes
+    Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+        Route::get('/users', [AdminController::class, 'users'])->name('users.index');
+        Route::get('/jobs', [AdminController::class, 'jobs'])->name('jobs.index');
+        Route::get('/applications', [AdminController::class, 'applications'])->name('applications.index');
+    });
 });
 
 require __DIR__.'/auth.php';

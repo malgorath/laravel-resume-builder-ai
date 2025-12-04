@@ -39,6 +39,19 @@
         @else
             <p class="text-muted">Please <a href="{{ route('login') }}">login</a> to apply for this job.</p>
         @endauth
+
+        @auth
+            @if(auth()->user()->isAdmin())
+                <hr>
+                <h5>Admin Actions</h5>
+                <a href="{{ route('jobs.edit', $job->id) }}" class="btn btn-warning">Edit Job</a>
+                <form action="{{ route('jobs.destroy', $job->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this job?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">Delete Job</button>
+                </form>
+            @endif
+        @endauth
     </div>
 </div>
 @endsection

@@ -42,6 +42,13 @@
             <ul class="navbar-nav ms-auto">
                 {{-- Authentication Links --}}
                 @auth
+                    @if(auth()->user()->isAdmin())
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
+                                <i class="bi bi-shield-check"></i> Admin Panel
+                            </a>
+                        </li>
+                    @endif
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" href="{{ route('profile.edit') }}">
                             <i class="bi bi-person-circle"></i> Profile
@@ -53,6 +60,12 @@
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            @if(auth()->user()->isAdmin())
+                                <a class="dropdown-item" href="{{ route('admin.dashboard') }}">
+                                    <i class="bi bi-shield-check"></i> Admin Dashboard
+                                </a>
+                                <hr class="dropdown-divider">
+                            @endif
                             <a class="dropdown-item" href="{{ route('profile.edit') }}">
                                 <i class="bi bi-gear"></i> Settings
                             </a>

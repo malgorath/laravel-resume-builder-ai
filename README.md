@@ -7,6 +7,8 @@ This application is designed to help users manage their job search process. It a
 - Job application tracking
 - Job search activity organization
 - User authentication and authorization
+- **Admin Panel**: Comprehensive admin dashboard for managing users, jobs, and applications
+- **Job Posting**: Admin-only job posting with full CRUD operations
 - Integration with Ollama for enhanced resume analysis
 - Utilization of LLM (Large Language Models) for AI-driven job recommendations
 
@@ -379,6 +381,55 @@ docker compose logs -f nginx
 
 ---
 
+## Admin Features
+
+The application includes a comprehensive admin panel accessible only to users with the `admin` role.
+
+### Admin Dashboard
+
+Access the admin dashboard at `/admin/dashboard` (requires admin role). The dashboard provides:
+
+- **Statistics Overview**: Total users, jobs, applications, and resumes
+- **Recent Activity**: Latest users, jobs, and applications
+- **Quick Actions**: Direct links to manage users, jobs, and applications
+
+### Admin Capabilities
+
+Admins have access to:
+
+1. **User Management** (`/admin/users`)
+   - View all registered users
+   - See user statistics (resumes, applications)
+   - View user roles
+
+2. **Job Management** (`/admin/jobs`)
+   - View all job listings
+   - Edit or delete any job
+   - See application counts per job
+
+3. **Application Management** (`/admin/applications`)
+   - View all job applications
+   - See applicant and job details
+   - Track application statuses
+
+4. **Job Posting**
+   - Only admins can create, edit, or delete job listings
+   - Regular users can view and apply to jobs but cannot post them
+
+### Default Admin User
+
+After running seeders, an admin user is created:
+
+- **Email**: `admin@example.com`
+- **Password**: `admin123`
+- **Role**: `admin`
+
+**Important**: Change the default admin password after first login!
+
+### Admin Middleware
+
+Admin routes are protected by the `EnsureUserIsAdmin` middleware, which checks if the authenticated user has the `admin` role. Non-admin users attempting to access admin routes will receive a 403 Forbidden error.
+
 ## Database Seeding
 
 To populate the database with sample data for testing:
@@ -402,9 +453,24 @@ php artisan migrate:fresh --seed
 ```
 
 Available seeders:
-- `UserSeeder` - Creates test users
-- `SkillSeeder` - Populates skills table
+- `SkillSeeder` - Populates skills table with technical and professional skills
+- `UserSeeder` - Creates test users (including admin user)
 - `UserDetailSeeder` - Creates user profile details
+- `JobSeeder` - Creates 15 demo job listings with realistic data
+
+### Seeded Data Details
+
+**Users:**
+- Test user: `test@home.net` / `password` (role: job_seeker)
+- Admin user: `admin@example.com` / `admin123` (role: admin)
+- 10 additional factory-generated users (role: job_seeker)
+
+**Jobs:**
+- 15 diverse job listings across 5 companies
+- Job titles include: Senior Laravel Developer, Full Stack Developer, DevOps Engineer, Data Scientist, Cybersecurity Specialist, and more
+- Multiple locations: San Francisco, New York, Remote, Austin, Boston, etc.
+- Realistic job descriptions and requirements
+- Associated companies: TechCorp Solutions, Digital Innovations Inc, Cloud Systems Ltd, Data Analytics Pro, SecureNet Technologies
 
 ---
 
@@ -425,8 +491,16 @@ php artisan test
 
 ### Test Coverage
 
-- **Authentication Tests**: Registration, login, logout, password reset
-- **Resume Tests**: Upload (PDF/DOCX), download, view, AI analysis
+- **Authentication Tests**: Registration, login, logout, password reset (7 tests)
+- **Resume Tests**: Upload (PDF/DOCX), download, view, AI analysis (13 tests)
+- **Admin Tests**: Admin dashboard, user management, job management, authorization (21 tests)
+- **Job Application Tests**: CRUD operations, authorization (9 tests)
+- **Profile Tests**: User details, skills management (5 tests)
+- **AI Service Tests**: Resume analysis, skill extraction, job matching (6 tests)
+- **Model Relationship Tests**: All model relationships (8 tests)
+- **UI Tests**: Authentication UI, form accessibility, Bootstrap styling (20 tests)
+
+**Total: 110 tests with 370 assertions**
 - **Profile & Skills Tests**: Update details, add/remove skills
 - **AI Service Tests**: Resume analysis, skill extraction, job matching (mocked)
 - **Job & Application Tests**: CRUD operations, application tracking

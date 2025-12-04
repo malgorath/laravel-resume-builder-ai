@@ -3,7 +3,11 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Job Listings</h1>
-    <a href="{{ route('jobs.create') }}" class="btn btn-primary">Post New Job</a>
+    @auth
+        @if(auth()->user()->isAdmin())
+            <a href="{{ route('jobs.create') }}" class="btn btn-primary">Post New Job</a>
+        @endif
+    @endauth
 </div>
 
 <!-- Search Form -->

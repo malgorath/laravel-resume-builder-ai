@@ -10,6 +10,15 @@ use Illuminate\Support\Facades\Auth;
 class JobController extends Controller
 {
     /**
+     * Create a new controller instance.
+     */
+    public function __construct()
+    {
+        // Only admins can create, edit, update, or delete jobs
+        $this->middleware('admin')->only(['create', 'store', 'edit', 'update', 'destroy']);
+    }
+
+    /**
      * Display a listing of jobs.
      */
     public function index(Request $request)
@@ -51,8 +60,17 @@ class JobController extends Controller
             'company' => 'required|string|max:255',
             'description' => 'required|string',
             'location' => 'required|string|max:255',
-            'requirements' => 'nullable|array',
+            'requirements' => 'nullable|string',
         ]);
+
+        // Convert requirements string to array if provided
+        if (!empty($validated['requirements'])) {
+            $validated['requirements'] = array_filter(
+                array_map('trim', explode("\n", $validated['requirements']))
+            );
+        } else {
+            $validated['requirements'] = null;
+        }
 
         Job::create($validated);
 
@@ -93,12 +111,21 @@ class JobController extends Controller
             'company' => 'required|string|max:255',
             'description' => 'required|string',
             'location' => 'required|string|max:255',
-            'requirements' => 'nullable|array',
+            'requirements' => 'nullable|string',
         ]);
+
+        // Convert requirements string to array if provided
+        if (!empty($validated['requirements'])) {
+            $validated['requirements'] = array_filter(
+                array_map('trim', explode("\n", $validated['requirements']))
+            );
+        } else {
+            $validated['requirements'] = null;
+        }
 
         $job->update($validated);
 
-        return redirect()->route('jobs.index')->with('success', 'Job listing updated successfully.');
+        return redirect()->route('jobs.show', $job->id)->with('success', 'Job listing updated successfully.');
     }
 
     /**
