@@ -16,7 +16,12 @@
 <div class="mb-3">
     <label class="form-label">Prompt Body</label>
     <textarea name="body" rows="8" class="form-control" required>{{ old('body', $prompt->body ?? '') }}</textarea>
-    <small class="text-muted">Use placeholders like <code>{{'{{resume_text}}'}}</code>, <code>{{'{{job_description}}'}}</code>, <code>{{'{{applicant_name}}'}}</code>.</small>
+    <small class="text-muted">
+        Use placeholders like
+        @verbatim
+            <code>{{resume_text}}</code>, <code>{{job_description}}</code>, <code>{{applicant_name}}</code>
+        @endverbatim
+    </small>
 </div>
 
 <div class="row g-3">
