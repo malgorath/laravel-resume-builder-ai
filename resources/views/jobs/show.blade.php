@@ -36,6 +36,13 @@
 
         @auth
             <hr>
+            <h5>Compare with My Resume</h5>
+            <p class="text-muted">Run an AI comparison between this job and your primary (or latest) resume.</p>
+            <button class="btn btn-outline-info mb-3" id="compare-btn" data-route="{{ route('jobs.compareResume', $job->id) }}">
+                Compare with My Resume
+            </button>
+
+            <hr>
             <h5>Apply for this Job</h5>
             @if($userApplications->count() > 0)
                 <div class="alert alert-info">
@@ -65,5 +72,73 @@
         @endauth
     </div>
 </div>
+
+<!-- Compare Modal -->
+<div class="modal fade" id="compareModal" tabindex="-1" aria-labelledby="compareModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="compareModalLabel">Job vs Resume Comparison</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="compare-loading" class="d-none">Running comparison...</div>
+                <div id="compare-error" class="alert alert-danger d-none"></div>
+                <pre id="compare-report" class="bg-light p-3 rounded" style="white-space: pre-wrap;"></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const compareBtn = document.getElementById('compare-btn');
+    if (!compareBtn) return;
+
+    const modalEl = document.getElementById('compareModal');
+    const modal = new bootstrap.Modal(modalEl);
+    const loadingEl = document.getElementById('compare-loading');
+    const errorEl = document.getElementById('compare-error');
+    const reportEl = document.getElementById('compare-report');
+
+    compareBtn.addEventListener('click', async () => {
+        loadingEl.classList.remove('d-none');
+        errorEl.classList.add('d-none');
+        errorEl.textContent = '';
+        reportEl.textContent = '';
+        modal.show();
+
+        try {
+            const response = await fetch(compareBtn.dataset.route, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                },
+            });
+
+            const data = await response.json();
+            loadingEl.classList.add('d-none');
+
+            if (!response.ok) {
+                errorEl.textContent = data.message || 'Comparison failed.';
+                errorEl.classList.remove('d-none');
+                return;
+            }
+
+            reportEl.textContent = data.report || 'No report generated.';
+        } catch (e) {
+            loadingEl.classList.add('d-none');
+            errorEl.textContent = 'Error running comparison.';
+            errorEl.classList.remove('d-none');
+        }
+    });
+});
+</script>
+@endpush
 @endsection
 

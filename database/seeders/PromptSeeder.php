@@ -53,6 +53,12 @@ class PromptSeeder extends Seeder
                 'body' => "Write a professional cover letter for the following job application. Use the resume information provided to tailor the cover letter.\n\nApplicant Name: {{applicant_name}}\n\nResume Summary:\n{{resume_text}}\n\nJob Description:\n{{job_description}}\n\nWrite a compelling cover letter that highlights relevant experience and skills from the resume that match the job requirements.",
                 'config' => $defaultConfig,
             ],
+            [
+                'key' => 'job_resume_comparison',
+                'title' => 'Job vs Resume Comparison',
+                'body' => "Compare the job description with the candidate resume and provide a concise report including: 1) match percentage 0-100, 2) key matching skills, 3) missing skills, 4) short recommendation. Keep it brief and bullet-like.\n\nJob Description:\n{{job_description}}\n\nResume:\n{{resume_text}}",
+                'config' => $defaultConfig,
+            ],
         ];
 
         foreach ($prompts as $prompt) {

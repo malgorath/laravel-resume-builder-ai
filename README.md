@@ -456,6 +456,8 @@ Available seeders:
 - `SkillSeeder` - Populates skills table with technical and professional skills
 - `PromptSeeder` - Seeds baseline LLM prompts and Ollama configs
 - Job listing skills are AI-extracted on job creation (and first view if missing) using the `job_skill_extraction` prompt and stored in `job_listing_skills` with a pivot to jobs. Tags appear on the job detail above the Apply section.
+- Job match % on `/jobs` is shown for logged-in users via overlap of job listing skills and user skills.
+- Job detail includes “Compare with My Resume” to run the `job_resume_comparison` prompt (uses primary resume if set, otherwise latest) and shows the report in a modal.
 
 ### Admin: LLM Prompts
 - Manage prompts and Ollama settings at `/admin/prompts` (admin only).

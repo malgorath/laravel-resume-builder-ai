@@ -30,6 +30,11 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ $job->title }}</h5>
                         <h6 class="card-subtitle mb-2 text-muted">{{ $job->company }} - {{ $job->location }}</h6>
+                        @auth
+                            @if(!is_null($job->match_percent))
+                                <span class="badge bg-info text-dark mb-2">Match: {{ $job->match_percent }}%</span>
+                            @endif
+                        @endauth
                         <p class="card-text">{{ Str::limit($job->description, 150) }}</p>
                         <a href="{{ route('jobs.show', $job->id) }}" class="btn btn-sm btn-primary">View Details</a>
                         @auth

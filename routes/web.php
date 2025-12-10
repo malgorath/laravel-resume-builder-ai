@@ -50,6 +50,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/resumes/{id}/match-job', [ResumesController::class, 'matchJob'])->name('resumes.matchJob');
     Route::post('/resumes/{id}/generate-cover-letter', [ResumesController::class, 'generateCoverLetter'])->name('resumes.generateCoverLetter');
 
+        // Job comparison
+        Route::post('/jobs/{job}/compare-resume', [JobController::class, 'compareResume'])->name('jobs.compareResume');
+
     // Job Routes (admin-only for create/edit/delete)
     // These must be before the public show route to avoid conflicts
     Route::get('/jobs/create', [JobController::class, 'create'])->name('jobs.create');

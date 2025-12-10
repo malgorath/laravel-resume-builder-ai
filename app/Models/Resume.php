@@ -11,7 +11,7 @@ class Resume extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'filename', 'mime_type', 'file_data']; // Added 'user_id'
+    protected $fillable = ['user_id', 'filename', 'mime_type', 'file_data', 'is_primary']; // Added 'user_id'
 
     protected $hidden = [ 
         'file_data',
