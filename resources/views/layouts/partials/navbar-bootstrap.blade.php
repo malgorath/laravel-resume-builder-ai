@@ -65,6 +65,9 @@
                                 <a class="dropdown-item" href="{{ route('admin.dashboard') }}">
                                     <i class="bi bi-shield-check"></i> Admin Dashboard
                                 </a>
+                                <a class="dropdown-item" href="{{ route('admin.prompts.index') }}">
+                                    <i class="bi bi-braces-asterisk"></i> AI Prompts
+                                </a>
                                 <hr class="dropdown-divider">
                             @endif
                             <a class="dropdown-item" href="{{ route('profile.edit') }}">

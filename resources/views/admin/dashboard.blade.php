@@ -132,7 +132,8 @@
                 <a href="{{ route('jobs.create') }}" class="btn btn-primary me-2">Post New Job</a>
                 <a href="{{ route('admin.users.index') }}" class="btn btn-secondary me-2">Manage Users</a>
                 <a href="{{ route('admin.jobs.index') }}" class="btn btn-secondary me-2">Manage Jobs</a>
-                <a href="{{ route('admin.applications.index') }}" class="btn btn-secondary">Manage Applications</a>
+                <a href="{{ route('admin.applications.index') }}" class="btn btn-secondary me-2">Manage Applications</a>
+                <a href="{{ route('admin.prompts.index') }}" class="btn btn-outline-info">Manage AI Prompts</a>
             </div>
         </div>
     </div>
