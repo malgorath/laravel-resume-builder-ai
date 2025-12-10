@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Job extends Model
 {
@@ -40,5 +41,13 @@ class Job extends Model
     public function applications(): HasMany
     {
         return $this->hasMany(Application::class, 'job_id');
+    }
+
+    /**
+     * Job listing skills (AI extracted).
+     */
+    public function listingSkills(): BelongsToMany
+    {
+        return $this->belongsToMany(JobListingSkill::class, 'job_job_listing_skill');
     }
 }

@@ -4,19 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Models\Job;
 use App\Models\Company;
+use App\Services\JobSkillService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class JobController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     */
-    public function __construct()
+    public function __construct(private JobSkillService $jobSkillService)
     {
         // Only admins can create, edit, update, or delete jobs
         $this->middleware('admin')->only(['create', 'store', 'edit', 'update', 'destroy']);
     }
+
+    /**
+     * Create a new controller instance.
+     */
+    // public function __construct()
+    // {
+    //     // Only admins can create, edit, update, or delete jobs
+    //     $this->middleware('admin')->only(['create', 'store', 'edit', 'update', 'destroy']);
+    // }
 
     /**
      * Display a listing of jobs.
@@ -72,7 +79,10 @@ class JobController extends Controller
             $validated['requirements'] = null;
         }
 
-        Job::create($validated);
+        $job = Job::create($validated);
+
+        // Extract job skills on create
+        $this->jobSkillService->extractAndAttach($job);
 
         return redirect()->route('jobs.index')->with('success', 'Job listing created successfully.');
     }
@@ -82,6 +92,9 @@ class JobController extends Controller
      */
     public function show(Job $job)
     {
+        // If no skills yet, attempt extraction on first view
+        $this->jobSkillService->extractAndAttach($job);
+
         $userApplications = Auth::check() 
             ? Auth::user()->applications()->where('job_id', $job->id)->get()
             : collect();

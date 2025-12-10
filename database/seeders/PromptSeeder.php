@@ -36,6 +36,12 @@ class PromptSeeder extends Seeder
                 'config' => $defaultConfig,
             ],
             [
+                'key' => 'job_skill_extraction',
+                'title' => 'Job Skill Extraction',
+                'body' => "Extract concise skill keywords from the following job description. Return a comma separated list of skill names only (no sentences, no extra text). Keep them lowercase and trim whitespace:\n\n{{job_description}}",
+                'config' => $defaultConfig,
+            ],
+            [
                 'key' => 'job_match',
                 'title' => 'Job Matching',
                 'body' => "Compare this resume with the job description and provide a match score (0-100) along with suggestions:\n\nResume:\n{{resume_text}}\n\nJob Description:\n{{job_description}}",

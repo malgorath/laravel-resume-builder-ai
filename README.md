@@ -455,6 +455,7 @@ php artisan migrate:fresh --seed
 Available seeders:
 - `SkillSeeder` - Populates skills table with technical and professional skills
 - `PromptSeeder` - Seeds baseline LLM prompts and Ollama configs
+- Job listing skills are AI-extracted on job creation (and first view if missing) using the `job_skill_extraction` prompt and stored in `job_listing_skills` with a pivot to jobs. Tags appear on the job detail above the Apply section.
 
 ### Admin: LLM Prompts
 - Manage prompts and Ollama settings at `/admin/prompts` (admin only).

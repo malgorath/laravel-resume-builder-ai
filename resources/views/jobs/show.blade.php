@@ -11,6 +11,17 @@
         <p class="mb-0 text-muted">{{ $job->company }} - {{ $job->location }}</p>
     </div>
     <div class="card-body">
+        @if($job->listingSkills->isNotEmpty())
+            <div class="mb-3">
+                <h6 class="mb-2">Skills</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach($job->listingSkills as $skill)
+                        <span class="badge bg-info text-dark">{{ $skill->name }}</span>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
         <h5>Description</h5>
         <p>{{ $job->description }}</p>
 

@@ -166,7 +166,7 @@ class OllamaService
     /**
      * Build prompt text and config from DB or fallback template.
      */
-    private function promptPayload(string $key, array $variables, string $fallbackTemplate): array
+    public function promptPayload(string $key, array $variables, string $fallbackTemplate): array
     {
         $prompt = Prompt::where('key', $key)->first();
         $template = $prompt?->body ?? $fallbackTemplate;
@@ -184,7 +184,7 @@ class OllamaService
         return $template;
     }
 
-    private function postToOllama(string $prompt, array $config)
+    public function postToOllama(string $prompt, array $config)
     {
         $payload = array_merge([
             'model' => self::$llm_model,
