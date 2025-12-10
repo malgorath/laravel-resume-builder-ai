@@ -3,10 +3,13 @@
 namespace App\Providers;
 
 use Illuminate\Support\Facades\Blade; // Import Blade facade
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use League\CommonMark\CommonMarkConverter; // Import the converter
 use League\CommonMark\Exception\CommonMarkException; // Import exception
+use App\Models\Prompt;
+use App\Policies\PromptPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
         // Use Bootstrap 5 pagination views
         Paginator::defaultView('pagination::bootstrap-5');
         Paginator::defaultSimpleView('pagination::simple-bootstrap-5');
+
+        Gate::policy(Prompt::class, PromptPolicy::class);
         
         Blade::directive('markdown', function (string $expression) {
             // $expression will be the variable passed, e.g., '$resume->ai_analysis'

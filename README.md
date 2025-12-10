@@ -454,6 +454,14 @@ php artisan migrate:fresh --seed
 
 Available seeders:
 - `SkillSeeder` - Populates skills table with technical and professional skills
+- `PromptSeeder` - Seeds baseline LLM prompts and Ollama configs
+
+### Admin: LLM Prompts
+- Manage prompts and Ollama settings at `/admin/prompts` (admin only).
+- Fields:
+  - `key` (unique), `title`, `body` (supports placeholders like `{{resume_text}}`, `{{job_description}}`, `{{applicant_name}}`).
+  - Ollama config per prompt: `temperature`, `top_p`, `top_k`, `repeat_penalty`, `num_ctx`, `seed`, `max_tokens`.
+- Prompts are pulled from the `prompts` table for resume analysis, skill extraction, job matching, and cover letters. If a DB prompt is missing, built-in defaults are used.
 - `UserSeeder` - Creates test users (including admin user)
 - `UserDetailSeeder` - Creates user profile details
 - `JobSeeder` - Creates 15 demo job listings with realistic data

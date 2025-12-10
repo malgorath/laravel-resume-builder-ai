@@ -33,7 +33,7 @@ test('skill extraction parses correctly', function () {
     ]);
 
     $resumeText = 'Experienced in PHP, Laravel, JavaScript, and MySQL.';
-    $skills = OllamaService::extractSkills($resumeText);
+    $skills = $this->aiService->extractSkills($resumeText);
 
     expect($skills)->toBeArray();
     expect($skills)->toContain('PHP');

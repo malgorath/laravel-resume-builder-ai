@@ -77,6 +77,9 @@ Route::middleware('auth')->group(function () {
         
         // Skill CRUD
         Route::resource('skills', \App\Http\Controllers\SkillController::class);
+
+        // Prompt CRUD
+        Route::resource('prompts', \App\Http\Controllers\PromptController::class)->except(['show']);
         
         // AI Suggestions (users can view their own, admins can manage all)
         Route::get('/ai-suggestions', [\App\Http\Controllers\AiSuggestionController::class, 'index'])->name('ai-suggestions.index');
