@@ -48,7 +48,7 @@ test('handles ollama connection timeout', function () {
     $resumeText = 'Test resume content.';
     $result = $this->aiService->analyzeResume($resumeText, $this->resume);
 
-    expect($result)->toBeString();
+    expect($result)->toContain('AI analysis unavailable');
 });
 
 test('handles malformed ollama response', function () {
@@ -61,8 +61,7 @@ test('handles malformed ollama response', function () {
     $resumeText = 'Test resume content.';
     $result = $this->aiService->analyzeResume($resumeText, $this->resume);
 
-    expect($result)->toBeString();
-    expect($result)->toContain('Error');
+    expect($result)->toContain('AI analysis unavailable');
 });
 
 test('job matching returns score', function () {

@@ -21,7 +21,7 @@
                     <td>{{ $resume->ai_analysis ? 'Completed' : 'Not Analyzed' }}</td>
                     <td>{{ $resume->created_at->format('d/m/Y H:i') }}</td>
                     <td>
-                        <a href="{{ route('resumes.show', $resume->id) }}">View</a> | <a href="{{ route('resumes.download', $resume->id) }}">Download</a> |
+                        <a href="{{ route('resumes.show', $resume->id) }}" data-loading-overlay>View</a> | <a href="{{ route('resumes.download', $resume->id) }}">Download</a> |
                         reset analysis: <a href="{{ route('resumes.resetAnalysis', $resume->id) }}">Reset</a>
                     </td>
                 </tr>

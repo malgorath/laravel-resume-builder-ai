@@ -21,13 +21,29 @@ class OllamaService
     // Analyze resume with Ollama AI
     public function analyzeResume($resumeText, $resume)
     {
-        $response = Http::timeout(config('ollama.timeout', 120))->post(self::$baseUrl, [
-            'model' => self::$llm_model,
-            'prompt' => "Analyze this resume:\n\n" . $resumeText,
-            'stream' => false,
-        ]);
+        $fallback = 'AI analysis unavailable. Please try again later.';
+
+        try {
+            $response = Http::timeout(config('ollama.timeout', 120))->post(self::$baseUrl, [
+                'model' => self::$llm_model,
+                'prompt' => "Analyze this resume:\n\n" . $resumeText,
+                'stream' => false,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error("AI analysis request failed for resume {$resume->id}: {$e->getMessage()}");
+            $resume->ai_analysis = $fallback;
+            $resume->save();
+            return $fallback;
+        }
+
+        if (! $response->successful()) {
+            Log::error("AI analysis HTTP error for resume {$resume->id}: status {$response->status()}");
+            $resume->ai_analysis = $fallback;
+            $resume->save();
+            return $fallback;
+        }
         
-        $analysis = $response->json()['response'] ?? 'Error analyzing resume.';
+        $analysis = $response->json()['response'] ?? $fallback;
         $skills = self::extractSkills($resumeText); // Extract skills from the resume text
         Log::info($skills); // Log the skills 
 
@@ -72,12 +88,17 @@ class OllamaService
             self::$llm_model = config('ollama.llm_model');
         }
 
-        // Prepare the API request payload
-        $response = Http::timeout(config('ollama.timeout', 120))->post(self::$baseUrl, [
-            'model' => self::$llm_model,
-            'prompt' => "Extract technical and professional skill words from the following resume text and return as comma seperated array only, trimming off extra white spaces as needed, only the data no extra characters or text: \n\n" . $text,
-            'stream' => false
-        ]);
+        try {
+            // Prepare the API request payload
+            $response = Http::timeout(config('ollama.timeout', 120))->post(self::$baseUrl, [
+                'model' => self::$llm_model,
+                'prompt' => "Extract technical and professional skill words from the following resume text and return as comma seperated array only, trimming off extra white spaces as needed, only the data no extra characters or text: \n\n" . $text,
+                'stream' => false
+            ]);
+        } catch (\Throwable $e) {
+            Log::error("Skill extraction request failed: {$e->getMessage()}");
+            return [];
+        }
 
         // Decode response
         if ($response->successful()) {

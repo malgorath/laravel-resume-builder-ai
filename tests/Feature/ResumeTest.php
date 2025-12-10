@@ -27,10 +27,12 @@ test('user can upload a PDF resume', function () {
     ]);
 
     $response->assertRedirect();
-    $this->assertDatabaseHas('resumes', [
-        'user_id' => $this->user->id,
-        'filename' => 'resume_' . time() . '.pdf',
-    ]);
+
+    $resume = Resume::where('user_id', $this->user->id)->latest('id')->first();
+
+    expect($resume)->not->toBeNull();
+    expect($resume->filename)->toMatch('/^resume_\d+\.pdf$/');
+    expect($resume->mime_type)->toBe('application/pdf');
 });
 
 test('user can upload a DOCX resume', function () {

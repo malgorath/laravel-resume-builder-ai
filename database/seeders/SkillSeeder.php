@@ -14,8 +14,19 @@ class SkillSeeder extends Seeder
      */
     public function run(): void
     {
-        // Prevent duplicates if run multiple times
-        DB::table('skills')->truncate(); // Optional: Clear table before seeding
+        $connection = DB::connection();
+        $driver = $connection->getDriverName();
+
+        // Safely clear tables while respecting foreign keys
+        if ($driver === 'mysql') {
+            $connection->statement('SET FOREIGN_KEY_CHECKS=0;');
+            DB::table('user_skills')->truncate();
+            DB::table('skills')->truncate();
+            $connection->statement('SET FOREIGN_KEY_CHECKS=1;');
+        } else {
+            DB::table('user_skills')->delete();
+            DB::table('skills')->delete();
+        }
 
         $skills = [
             // Programming Languages

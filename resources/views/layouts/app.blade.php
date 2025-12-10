@@ -89,6 +89,37 @@
                 min-width: 38px;
                 text-align: center;
             }
+            /* Loading overlay */
+            #loading-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.65);
+                display: none;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+                z-index: 2000;
+            }
+            #loading-overlay.show {
+                display: flex;
+            }
+            .loading-brain {
+                width: 72px;
+                height: 72px;
+                border-radius: 9999px;
+                background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 36px;
+                color: #fff;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+                animation: brain-spin 1.1s linear infinite;
+            }
+            @keyframes brain-spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
         </style>
 
     </head>
@@ -115,8 +146,45 @@
             </main>
         </div>
 
+        <div id="loading-overlay" aria-live="polite" aria-busy="true" role="status">
+            <div class="loading-brain" aria-hidden="true">🧠</div>
+            <div class="text-white mt-3 fw-semibold">Analyzing resume...</div>
+        </div>
+
         <!-- Bootstrap JS Bundle (includes Popper) -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+        <script>
+            (function () {
+                const overlay = document.getElementById('loading-overlay');
+                if (!overlay) return;
+
+                const showOverlay = () => overlay.classList.add('show');
+                const hideOverlay = () => overlay.classList.remove('show');
+
+                // Expose helpers in case inline handlers ever need them
+                window.__showLoadingOverlay = showOverlay;
+                window.__hideLoadingOverlay = hideOverlay;
+
+                // Capture clicks on any element marked with data-loading-overlay (event delegation)
+                document.addEventListener('click', (event) => {
+                    const target = event.target.closest('[data-loading-overlay]');
+                    if (!target) return;
+                    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                    showOverlay();
+                }, true);
+
+                // Also handle form submissions with the attribute
+                document.addEventListener('submit', (event) => {
+                    if (event.target?.hasAttribute('data-loading-overlay')) {
+                        showOverlay();
+                    }
+                }, true);
+
+                // Hide overlay when the page finishes loading (in case it was shown early)
+                window.addEventListener('pageshow', hideOverlay);
+            })();
+        </script>
 
     </body>
 </html>

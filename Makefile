@@ -1,6 +1,6 @@
 # Docker Makefile for Laravel Resume Builder AI
 
-.PHONY: help build up down restart logs shell artisan composer npm fresh migrate seed seeds test cache-clear
+.PHONY: help build up down restart logs shell artisan composer npm fresh migrate seed seeds test test-verbose test-file cache-clear setup
 
 # Default target
 help:
@@ -103,10 +103,25 @@ setup:
 	@cp docker.env.example .env 2>/dev/null || true
 	docker compose build
 	docker compose up -d
-	@echo "Waiting for containers to be ready..."
-	@sleep 10
-	docker compose exec app php artisan key:generate
-	docker compose exec app php artisan migrate
+	@echo "Waiting for database to be ready..."
+	@timeout=60; \
+	while [ $$timeout -gt 0 ]; do \
+		if docker compose exec -T db mysqladmin ping -h localhost -u root -psecret 2>/dev/null | grep -q "mysqld is alive"; then \
+			echo "Database is ready!"; \
+			break; \
+		fi; \
+		echo "Waiting for database... ($$timeout seconds remaining)"; \
+		sleep 2; \
+		timeout=$$((timeout - 2)); \
+	done; \
+	if [ $$timeout -le 0 ]; then \
+		echo "Error: Database did not become ready in time"; \
+		exit 1; \
+	fi
+	@echo "Generating application key..."
+	@docker compose exec app php artisan key:generate
+	@echo "Running migrations..."
+	@docker compose exec app php artisan migrate
 	@echo ""
 	@echo "Setup complete! Application is running at http://localhost:8080"
 
